@@ -40,5 +40,5 @@ testObj.svg.selectAll("circle")
     .attr("cy", p => p.y)
     .attr("r", 5)
     .attr("fill", "red")
-testObj.saveAsHTML("test_out.html");
-testObj.saveAsSVG("test_out.svg");
+testObj.saveAsHTML("test.html");
+testObj.saveAsSVG("test.svg");
