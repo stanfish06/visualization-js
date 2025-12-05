@@ -9,7 +9,7 @@ draw some stuffs using d3.js
   <tr>
     <td width="100%">
       <a href="examples/manifold-scatter.svg">
-        <img src="examples/manifold-scatter.svg?raw=true" width="300">
+        <img src="examples/manifold-scatter.svg" width="300">
       </a>
     </td>
   </tr>
