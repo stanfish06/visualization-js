@@ -12,13 +12,15 @@ scatter.createSVG(width, height);
 // data - spiral with depth
 const data = (() => {
   const points = [];
-  const noise = d3.randomNormal(0, 0.5);
-  for (let i = 0; i < 400; i++) {
-    const t = i / 60;
-    const x = t * Math.cos(t) + 47.5 + noise();
-    const y = t * Math.sin(t) + 47.5 + noise();
-    const z = t;
-    points.push([x, y, z]);
+  const noise = d3.randomNormal.source(d3.randomLcg(42))(0, 0.15);
+  for (let i = 250; i < 2000; i++) {
+    const t = i / 200;
+    for (let j = 0; j < 3; j++) {
+      const x = 0.3 * t * Math.cos(t) + 47.5 + noise();
+      const y = 0.3 * t * Math.sin(t) + 47.5 + noise();
+      const z = t;
+      points.push([x, y, z]);
+    }
   }
   return points;
 })();
@@ -34,17 +36,30 @@ const theme = `
 `;
 scatter.updateStyle(theme);
 
-// axes
+// axes - adapt to data
+const xExtent = d3.extent(data, (d) => d[0]);
+const yExtent = d3.extent(data, (d) => d[1]);
 const x = d3
   .scaleLinear()
-  .domain([40, 55])
-  .range([margin.left, width - margin.right]);
+  .domain(xExtent)
+  .range([margin.left, width - margin.right])
+  .nice();
 const y = d3
   .scaleLinear()
-  .domain([40, 55])
-  .range([height - margin.bottom, margin.top]);
+  .domain(yExtent)
+  .range([height - margin.bottom, margin.top])
+  .nice();
 
-// draw background spiral tube
+// draw background spiral manifold
+const manifoldPath = (() => {
+  const points = [];
+  for (let i = 125; i < 1000; i++) {
+    const t = i / 100;
+    points.push([0.3 * t * Math.cos(t) + 47.5, 0.3 * t * Math.sin(t) + 47.5]);
+  }
+  return points;
+})();
+
 const spiralPath = d3
   .line()
   .x((d) => x(d[0]))
@@ -53,11 +68,11 @@ const spiralPath = d3
 
 scatter.svg
   .append("path")
-  .datum(data)
-  .attr("class", "manifold-bg")
+  .datum(manifoldPath)
   .attr("d", spiralPath)
-  .attr("stroke", "#c0c0c0")
-  .attr("stroke-width", 20)
+  .attr("stroke", "#d0d0d0")
+  .attr("stroke-width", 40)
+  .attr("stroke-linecap", "round")
   .attr("fill", "none");
 
 // apply data to svg
