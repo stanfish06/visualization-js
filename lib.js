@@ -1,26 +1,26 @@
 import * as d3 from "d3";
 import * as THREE from "three";
-import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
+import { SVGRenderer } from "three/examples/jsm/renderers/SVGRenderer.js";
 import * as fs from "fs";
 import { JSDOM } from "jsdom";
 
 export { D3DOM, ThreeDOM };
 
 class ThreeDOM {
-  constructor (renderer_width = 500, renderer_height = 500) {
+  constructor(renderer_width = 500, renderer_height = 500) {
     const dom = new JSDOM();
     const { document } = dom.window;
     this.dom = dom;
     // three js expects global doc
     global.document = document;
-        
+
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera()
+    this.camera = new THREE.PerspectiveCamera();
     this.renderer = new SVGRenderer();
     this.renderer.setSize(renderer_width, renderer_height);
   }
   saveAsHTML(fname) {
-    global.document.body.appendChild( this.renderer.domElement );
+    global.document.body.appendChild(this.renderer.domElement);
     const html = this.dom.serialize();
     fs.writeFileSync(fname, html);
   }
