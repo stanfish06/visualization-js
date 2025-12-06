@@ -4,10 +4,10 @@ import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 import * as fs from "fs";
 import { JSDOM } from "jsdom";
 
-export { D3DOM };
+export { D3DOM, ThreeDOM };
 
 class ThreeDOM {
-  constructor () {
+  constructor (renderer_width = 500, renderer_height = 500) {
     const dom = new JSDOM();
     const { document } = dom.window;
     this.dom = dom;
@@ -17,11 +17,16 @@ class ThreeDOM {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera()
     this.renderer = new SVGRenderer();
+    this.renderer.setSize(renderer_width, renderer_height);
   }
   saveAsHTML(fname) {
     global.document.body.appendChild( this.renderer.domElement );
     const html = this.dom.serialize();
     fs.writeFileSync(fname, html);
+  }
+  saveAsSVG(fname) {
+    const svg = this.renderer.domElement.outerHTML;
+    fs.writeFileSync(fname, svg);
   }
 }
 
@@ -57,8 +62,9 @@ class D3DOM {
   }
 }
 
-const testObj = new ThreeDOM();
-testObj.saveAsHTML("test.html");
+// const testObj = new ThreeDOM();
+// testObj.saveAsHTML("test.html");
+// testObj.saveAsSVG("test.svg");
 
 // const data = [
 //   { x: 50, y: 50 },

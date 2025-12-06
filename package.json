@@ -8,7 +8,7 @@
   "main": "lib.js",
   "scripts": {
     "test": "node lib.js",
-    "all": "node examples/*.js",
+    "all": "sh -c 'for f in examples/*.js; do node $f || exit 1; done'",
     "clean": "rm test.svg test.html"
   },
   "dependencies": {
