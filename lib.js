@@ -1,8 +1,29 @@
 import * as d3 from "d3";
+import * as THREE from "three";
+import { SVGRenderer } from 'three/examples/jsm/renderers/SVGRenderer.js';
 import * as fs from "fs";
 import { JSDOM } from "jsdom";
 
 export { D3DOM };
+
+class ThreeDOM {
+  constructor () {
+    const dom = new JSDOM();
+    const { document } = dom.window;
+    this.dom = dom;
+    // three js expects global doc
+    global.document = document;
+        
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera()
+    this.renderer = new SVGRenderer();
+  }
+  saveAsHTML(fname) {
+    global.document.body.appendChild( this.renderer.domElement );
+    const html = this.dom.serialize();
+    fs.writeFileSync(fname, html);
+  }
+}
 
 class D3DOM {
   constructor() {
@@ -35,6 +56,9 @@ class D3DOM {
     fs.writeFileSync(fname, svg.outerHTML);
   }
 }
+
+const testObj = new ThreeDOM();
+testObj.saveAsHTML("test.html");
 
 // const data = [
 //   { x: 50, y: 50 },
