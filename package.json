@@ -12,8 +12,10 @@
     "clean": "rm test.svg test.html"
   },
   "dependencies": {
+    "@remotion/cli": "4.0.409",
     "d3": "^7.9.0",
     "jsdom": "^27.2.0",
+    "remotion": "4.0.409",
     "three": "^0.181.2"
   },
   "devDependencies": {
