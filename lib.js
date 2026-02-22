@@ -3,8 +3,9 @@ import * as THREE from "three";
 import { SVGRenderer } from "three/examples/jsm/renderers/SVGRenderer.js";
 import * as fs from "fs";
 import { JSDOM } from "jsdom";
+import pptxgen from "pptxgenjs";
 
-export { D3DOM, ThreeDOM };
+export { D3DOM, ThreeDOM, PptxDeck, PptxSlide };
 
 class ThreeDOM {
   constructor(renderer_width = 500, renderer_height = 500) {
@@ -56,9 +57,63 @@ class D3DOM {
     const html = this.dom.serialize();
     fs.writeFileSync(fname, html);
   }
+  getSVGString() {
+    return this.d3Container.select("svg").node().outerHTML;
+  }
   saveAsSVG(fname) {
-    const svg = this.d3Container.select("svg").node();
-    fs.writeFileSync(fname, svg.outerHTML);
+    fs.writeFileSync(fname, this.getSVGString());
+  }
+}
+
+class PptxSlide {
+  constructor(rawSlide) {
+    this.raw = rawSlide;
+  }
+  addD3SVG(svgString, { x, y, w, h }) {
+    const base64 = Buffer.from(svgString).toString("base64");
+    this.raw.addImage({
+      data: `data:image/svg+xml;base64,${base64}`,
+      x,
+      y,
+      w,
+      h,
+    });
+    return this;
+  }
+}
+
+class PptxDeck {
+  constructor({ layout = "LAYOUT_WIDE", template = {} } = {}) {
+    this.pptx = new pptxgen();
+    this.pptx.layout = layout;
+    this.slideCount = 0;
+    const defaults = {
+      title: { x: 0.5, y: 0.2, fontSize: 24, bold: true, color: "333333" },
+      text: { x: 0.5, y: 0.8, fontSize: 14, color: "666666" },
+      slideNumber: { x: "90%", y: "95%", fontSize: 10, color: "999999" },
+    };
+    this.template = {
+      title: { ...defaults.title, ...template.title },
+      text: { ...defaults.text, ...template.text },
+      slideNumber: { ...defaults.slideNumber, ...template.slideNumber },
+    };
+  }
+  addSlide({ title, text, showSlideNumber = true } = {}) {
+    this.slideCount++;
+    const rawSlide = this.pptx.addSlide();
+    if (title) {
+      rawSlide.addText(title, this.template.title);
+    }
+    if (text) {
+      rawSlide.addText(text, this.template.text);
+    }
+    if (showSlideNumber) {
+      rawSlide.addText(String(this.slideCount), this.template.slideNumber);
+    }
+    return new PptxSlide(rawSlide);
+  }
+  async save(fileName) {
+    return this.pptx.writeFile({ fileName });
   }
 }
 
